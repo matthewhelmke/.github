@@ -21,7 +21,7 @@ Edit your workflow's YAML configuration file, replacing the current source of an
 - uses: chainguard-actions/<action-name>@main
 ```
 
-## Steps you need to take
+## Configure your workflows to use Chainguard Actions
 
 Take the following steps to switch your workflow over to using Chainguard Actions.
 
