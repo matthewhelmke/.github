@@ -118,6 +118,26 @@ See GitHub to learn more about the [commit hash for GitHub Actions](https://gith
 
 Here are a few examples of migrations to help you get started with yours. Each example is focused on one specific attribute for clarity.
 
+### The compromise using `tj-actions/changed-files`
+
+All that happens here is that we change the `uses:` line. Even with the same `with:` block and the same outputs, and still using the mutable version tag, if there was an upstream compromise, it would never hit the Chainguard repo and you would be protected. This is the quick and easy implementation, the compromise, that doesn't yet implement pinning by SHA and it still provides significant protection.
+
+```yaml
+# Before
+- uses: tj-actions/changed-files@v45
+  with:
+    files: |
+      src/**
+      tests/**
+
+# After
+- uses: chainguard-actions/changed-files@v45>
+  with:
+    files: |
+      src/**
+      tests/**
+```
+
 ### Container screening example using `aquasecurity/trivy-action`
 
 `@master` in the community version is especially risky — it always runs whatever the upstream just pushed. The hardened version lets you pin to a SHA and still get automatic re-hardening behind the scenes.
