@@ -114,6 +114,96 @@ Here's what our example looks like with the full SHA:
 
 See GitHub to learn more about the [commit hash for GitHub Actions](https://github.com/marketplace/actions/commit-hash).
 
+## Example migrations
+
+Here are a few examples of migrations to help you get started with yours. Each example is focused on one specific attribute for clarity.
+
+### Container screening example using `aquasecurity/trivy-action`
+
+`@master` in the community version is especially risky — it always runs whatever the upstream just pushed. The hardened version lets you pin to a SHA and still get automatic re-hardening behind the scenes.
+
+```yaml
+# Before
+- uses: aquasecurity/trivy-action@master
+  with:
+    image-ref: 'my-org/my-image:${{ github.sha }}'
+    severity: 'CRITICAL,HIGH'
+    exit-code: '1'
+
+# After
+- uses: chainguard-actions/trivy-action@v0.28
+  with:
+    image-ref: 'my-org/my-image:${{ github.sha }}'
+    severity: 'CRITICAL,HIGH'
+    exit-code: '1'
+```
+
+### Docker image builds using `docker/build-push-action`
+
+`docker/login-action` gets invoked with registry credentials on every build — exactly the kind of secret-adjacent action customers want hardened.
+
+```yaml
+# Before
+- uses: docker/login-action@v3
+  with:
+    username: ${{ secrets.DOCKER_USERNAME }}
+    password: ${{ secrets.DOCKER_PASSWORD }}
+
+- uses: docker/build-push-action@v6
+  with:
+    context: .
+    push: true
+    tags: my-org/my-image:${{ github.sha }}
+
+# After
+- uses: chainguard-actions/login-action@<sha>
+  with:
+    username: ${{ secrets.DOCKER_USERNAME }}
+    password: ${{ secrets.DOCKER_PASSWORD }}
+
+- uses: chainguard-actions/build-push-action@<sha>
+  with:
+    context: .
+    push: true
+    tags: my-org/my-image:${{ github.sha }}
+```
+
+### Cloud credentials using `aws-actions/configure-aws-credentials`
+
+This handles OIDC exchange for your AWS short-lived credentials. Any compromise here would give an attacker direct access to your AWS environment — one of the most consequential actions to harden.
+
+```yaml
+# Before
+- uses: aws-actions/configure-aws-credentials@v4
+  with:
+    role-to-assume: arn:aws:iam::123456789012:role/ci-role
+    aws-region: us-east-1
+
+# After
+- uses: chainguard-actions/configure-aws-credentials@<sha>
+  with:
+    role-to-assume: arn:aws:iam::123456789012:role/ci-role
+    aws-region: us-east-1
+```
+
+### SBOM generation using `anchore/sbom-action`
+
+This generates SPDX/CycloneDX SBOMs with Syft, which is widely used for SLSA/compliance attestations — customers asking about supply-chain provenance consistently ask for this one.
+
+```yaml
+# Before
+- uses: anchore/sbom-action@v0
+  with:
+    image: my-org/my-image:${{ github.sha }}
+    format: spdx-json
+
+# After
+- uses: chainguard-actions/sbom-action@<sha>
+  with:
+    image: my-org/my-image:${{ github.sha }}
+    format: spdx-json
+```
+
 ## Hardened action repo contents
 
 In each repo for a hardened action, you will find:
