@@ -182,10 +182,10 @@ Expected output:
 
 ```output
     scanning $GIT_ORGANIZATION/$REPO for workflows and actions
-               ACTION            | REQUESTED | USED BY
-    -----------------------------|-----------|---------
-     actions/checkout            | v4        | 1
-     chainguard-actions/checkout | v6.0.2    | 1
+               ACTION                    | REQUESTED | USED BY
+    -------------------------------------|-----------|---------
+     actions/checkout                    | v4        | 1
+     chainguard-actions/actions-checkout | v6.0.2    | 1
 
     2 actions, 0 container images
 
